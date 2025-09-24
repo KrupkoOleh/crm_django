@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+    <table class="table table-bordered custom-table">
+        {% for task in project.tasks.all %}
+            <tbody>
+            <tr>
+                <td class="input-checkbox"><input type="checkbox"></td>
+                <td class="col-10">{{ task.name }}</td>
+                <td class="col-1"></td>
+            </tr>
+            </tbody>
+        {% endfor %}
+    </table>
+{% endblock %}
