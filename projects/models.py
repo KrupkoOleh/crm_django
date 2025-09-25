@@ -10,6 +10,8 @@ class Projects(PKMixin):
     def __str__(self):
         return self.name
 
+    class Meta:
+        unique_together = ('name',)
 
 
 class Tasks(PKMixin):
@@ -30,6 +32,8 @@ class Tasks(PKMixin):
 
     class Meta:
         ordering = ['priority']
+        unique_together = ('name', 'project')
 
-    def __str__(self):
-        return self.name
+
+def __str__(self):
+    return self.name
