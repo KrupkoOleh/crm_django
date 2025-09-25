@@ -20,7 +20,7 @@
 {#    </li>#}
 {#{% endblock %}#}
 {% load static %}
-<li id="task-{{ task.id }}" style="list-style-type: none">
+<li class="task-element" id="task-{{ task.id }}" style="list-style-type: none">
     <table class="table table-bordered custom-table mb-0">
         <tbody>
         <tr>
@@ -29,17 +29,19 @@
             </td>
             <td class="col-10">{{ task.name }}</td>
             <td class="col-1">
-                <button hx-get="{% url 'task-update' task.pk %}"
-                        hx-target="#task-update-form-container-{{ task.id }}"
-                        hx-swap="innerHTML"><img src="{% static 'images/icons/edit.svg' %}" alt="update">
-                </button>
-                <button
-                        hx-post="{% url 'task-delete' task.pk %}"
-                        hx-target="#tasks-{{ task.project.id }}"
-                        hx-swap="innerHTML"
-                        hx-confirm="Вы уверены, что хотите удалить задачу?">
-                    <img src="{% static 'images/icons/trash.svg' %}" alt="delete">
-                </button>
+                <div class="task-tools">
+                    <button hx-get="{% url 'task-update' task.pk %}"
+                            hx-target="#task-update-form-container-{{ task.id }}"
+                            hx-swap="innerHTML"><img src="{% static 'images/icons/edit.svg' %}" alt="update">
+                    </button>
+                    <button
+                            hx-post="{% url 'task-delete' task.pk %}"
+                            hx-target="#tasks-{{ task.project.id }}"
+                            hx-swap="innerHTML"
+                            hx-confirm="Вы уверены, что хотите удалить задачу?">
+                        <img src="{% static 'images/icons/trash.svg' %}" alt="delete">
+                    </button>
+                </div>
             </td>
         </tr>
         </tbody>

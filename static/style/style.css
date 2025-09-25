@@ -12,11 +12,15 @@ body {
     padding: 10px 25px;
 }
 
-.card-header-items {
+.card-header-items, .task-tools {
     display: none;
 }
 
 .card-header:hover .card-header-items {
+    display: flex;
+}
+
+.task-element:hover .task-tools {
     display: flex;
 }
 
