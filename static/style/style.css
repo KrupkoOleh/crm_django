@@ -1,0 +1,25 @@
+body {
+    padding: 50px 40px;
+}
+
+.custom-table td:first-child {
+    border-right: 4px double #dee2e6 !important;
+}
+
+.card-header {
+    background-color: #3875d7;
+    color: #FAFAFA;
+    padding: 10px 25px;
+}
+
+.card-header-items {
+    display: none;
+}
+
+.card-header:hover .card-header-items {
+    display: flex;
+}
+
+.input-checkbox {
+    width: 1%;
+}
