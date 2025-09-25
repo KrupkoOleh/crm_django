@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
-from projects.forms import TaskForm
+from projects.forms import CreateTaskForm, UpdateTaskForm
 from projects.models import Projects, Tasks
 
 
@@ -13,9 +13,7 @@ class ProjectListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Добавляем пустую форму создания задачи в контекст
-        # Это та форма, которую будет использовать project_card.html
-        context['form'] = TaskForm()
+        context['form'] = CreateTaskForm()
         return context
 
 
@@ -55,7 +53,7 @@ class ProjectDeleteView(DeleteView):
 
 class TaskCreateView(CreateView):
     model = Tasks
-    form_class = TaskForm
+    form_class = CreateTaskForm
 
     def form_valid(self, form):
         project = Projects.objects.get(id=self.kwargs.get('project_id'))
@@ -68,3 +66,15 @@ class TaskCreateView(CreateView):
 
         return super().form_valid(form)
 
+
+class TaskUpdateView(UpdateView):
+    model = Tasks
+    form_class = UpdateTaskForm
+    template_name = 'partials/tasks/task_update_form.html'
+
+    def form_valid(self, form):
+        task = form.save()
+        if self.request.headers.get("HX-Request"):
+            html = render_to_string("partials/tasks/list.html", {"task": task})
+            return HttpResponse(html)
+        return super().form_valid(form)
