@@ -1,18 +1,22 @@
-{% extends 'base.html' %}
+{#{% extends 'base.html' %}#}
 {% block content %}
-    <div class="card-items">
-        {% for project in projects %}
-            <div class="card">
-                <div class="card-header">
-                    <h2>{{ project.name }}</h2>
-                    <div class="card-header-items">
-                        test
-                    </div>
-                </div>
-                <div class="card-body">
-                    {% include 'partials/tasks/list.html' with project=project %}
-                </div>
+    <div class="projects-list">
+        <div id="projects-container">
+            {% for project in projects %}
+                {% include 'partials/projects/project_card.html' with project=project %}
+            {% endfor %}
+        </div>
+
+        <div class="button-add-projects d-flex flex-column justify-content-center mt-5">
+            <div id="project-form-container" class="d-flex justify-content-center"></div>
+            <div class="button-create-project d-flex justify-content-center align-center">
+                <button class="btn btn-primary py-3 px-5"
+                        hx-get="{% url 'projects-create' %}"
+                        hx-target="#project-form-container"
+                        hx-trigger="click">
+                    Add TODO List
+                </button>
             </div>
-        {% endfor %}
+        </div>
     </div>
 {% endblock %}
