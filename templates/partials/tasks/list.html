@@ -1,12 +1,14 @@
 {% extends 'base.html' %}
 {% block content %}
-    <table class="table table-bordered custom-table mb-0">
-        <tbody>
-        <tr>
-            <td class="input-checkbox"><input type="checkbox"></td>
-            <td class="col-10">{{ task.name }}</td>
-            <td class="col-1"></td>
-        </tr>
-        </tbody>
-    </table>
+    <li id="task-{{ task.id }}" style="list-style-type: none">
+        <table class="table table-bordered custom-table mb-0">
+            <tbody>
+            <tr>
+                <td class="input-checkbox"><input type="checkbox"></td>
+                <td class="col-10">{{ task.name }}</td>
+                <td class="col-1"></td>
+            </tr>
+            </tbody>
+        </table>
+    </li>
 {% endblock %}

@@ -2,13 +2,21 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
-from projects.models import Projects
+from projects.forms import TaskForm
+from projects.models import Projects, Tasks
 
 
 class ProjectListView(ListView):
     model = Projects
     template_name = 'projects/table.html'
     context_object_name = 'projects'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Добавляем пустую форму создания задачи в контекст
+        # Это та форма, которую будет использовать project_card.html
+        context['form'] = TaskForm()
+        return context
 
 
 class ProjectCreateView(CreateView):
@@ -45,4 +53,18 @@ class ProjectDeleteView(DeleteView):
         return HttpResponse(html)
 
 
+class TaskCreateView(CreateView):
+    model = Tasks
+    form_class = TaskForm
+
+    def form_valid(self, form):
+        project = Projects.objects.get(id=self.kwargs.get('project_id'))
+        form.instance.project = project
+        task = form.save()
+
+        if self.request.headers.get("HX-Request"):
+            html = render_to_string("partials/tasks/list.html", {"task": task})
+            return HttpResponse(html)
+
+        return super().form_valid(form)
 

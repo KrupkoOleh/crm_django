@@ -23,12 +23,12 @@
             </div>
         </div>
         <div class="card-body p-0">
+            {% include 'partials/tasks/task_create.html' with project_id=project.id %}
             <ul id="tasks-{{ project.id }}" class="px-0 my-0">
                 {% for task in project.tasks.all %}
                     {% include 'partials/tasks/list.html' with task=task %}
                 {% endfor %}
             </ul>
-
         </div>
     </div>
 {% endblock content %}
