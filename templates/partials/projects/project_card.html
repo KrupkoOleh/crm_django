@@ -24,9 +24,13 @@
         </div>
         <div class="card-body p-0">
             {% include 'partials/tasks/task_create.html' with project_id=project.id %}
-            <ul id="tasks-{{ project.id }}" class="px-0 my-0">
-                {% include 'partials/tasks/tasks_list.html' with tasks=project.tasks.all %}
-            </ul>
+            <form class="sortable-form" hx-post="{% url 'tasks-reorder' project_id=project.id %}" hx-trigger="end">
+                <ul id="tasks-{{ project.id }}" class="px-0 my-0 sortable"
+                    hx-post="{% url 'tasks-reorder' project_id=project.id %}" hx-trigger="end">
+                    {% include 'partials/tasks/tasks_list.html' with tasks=project.tasks.all %}
+                </ul>
+            </form>
         </div>
+
     </div>
 {% endblock content %}

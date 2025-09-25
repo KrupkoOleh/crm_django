@@ -37,6 +37,7 @@
         crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"
         integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 {% block extra_scripts %}
     <script>
         document.body.addEventListener('htmx:configRequest', (event) => {
@@ -45,7 +46,43 @@
                 event.detail.headers['X-CSRFToken'] = csrftoken;
             }
         });
+
+        htmx.onLoad(function (content) {
+            var sortables = content.querySelectorAll(".sortable");
+            for (var i = 0; i < sortables.length; i++) {
+                var sortable = sortables[i];
+                var sortableInstance = new Sortable(sortable, {
+                    handle: '.drag-handle',
+                    animation: 150,
+                    ghostClass: 'blue-background-class',
+
+                    // Сделать `.htmx-indicator` не сортируемым
+                    filter: ".htmx-indicator",
+                    onMove: function (evt) {
+                        return evt.related.className.indexOf('htmx-indicator') === -1;
+                    },
+
+                    // На событии end отправляем форму с новым порядком
+                    onEnd: function (evt) {
+                        // На время отключаем сортировку
+                        this.option("disabled", true);
+
+                        // Найти родительскую форму и триггернуть htmx
+                        var form = evt.from.closest('form');
+                        if (form) {
+                            htmx.trigger(form, 'end'); // 'end' триггер совпадает с hx-trigger
+                        }
+                    }
+                });
+
+                // Включаем сортировку после htmx-обновления
+                sortable.addEventListener("htmx:afterSwap", function () {
+                    sortableInstance.option("disabled", false);
+                });
+            }
+        });
     </script>
+
 {% endblock extra_scripts %}
 </body>
 </html>

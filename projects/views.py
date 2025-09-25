@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+from django.views import View
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 from projects.forms import CreateTaskForm, UpdateTaskForm
@@ -90,3 +91,12 @@ class TaskDeleteView(DeleteView):
         html = render_to_string('partials/tasks/tasks_list.html', {'tasks': tasks})
         return HttpResponse(html)
 
+
+class TaskReorderView(View):
+    def post(self, request, project_id):
+        task_ids = request.POST.getlist('task')
+        for index, task_id in enumerate(task_ids):
+            task = Tasks.objects.get(id=task_id, project_id=project_id)
+            task.priority = index
+            task.save()
+        return HttpResponse(status=204)
