@@ -45,7 +45,6 @@ class ProjectDeleteView(DeleteView):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         self.object.delete()
-        # После удаления возвращаем обновлённый список проектов
         projects = Projects.objects.all()
         html = render_to_string('partials/projects/projects_list.html', {'projects': projects})
         return HttpResponse(html)
@@ -78,3 +77,16 @@ class TaskUpdateView(UpdateView):
             html = render_to_string("partials/tasks/list.html", {"task": task})
             return HttpResponse(html)
         return super().form_valid(form)
+
+
+class TaskDeleteView(DeleteView):
+    model = Tasks
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        project = self.object.project
+        self.object.delete()
+        tasks = project.tasks.all()
+        html = render_to_string('partials/tasks/tasks_list.html', {'tasks': tasks})
+        return HttpResponse(html)
+

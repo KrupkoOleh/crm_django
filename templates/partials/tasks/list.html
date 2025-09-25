@@ -33,6 +33,13 @@
                         hx-target="#task-update-form-container-{{ task.id }}"
                         hx-swap="innerHTML"><img src="{% static 'images/icons/edit.svg' %}" alt="update">
                 </button>
+                <button
+                        hx-post="{% url 'task-delete' task.pk %}"
+                        hx-target="#tasks-{{ task.project.id }}"
+                        hx-swap="innerHTML"
+                        hx-confirm="Вы уверены, что хотите удалить задачу?">
+                    <img src="{% static 'images/icons/trash.svg' %}" alt="delete">
+                </button>
             </td>
         </tr>
         </tbody>
