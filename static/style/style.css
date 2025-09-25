@@ -20,6 +20,11 @@ body {
     display: flex;
 }
 
+button:not(:disabled) {
+    background: none;
+    border: none;
+}
+
 .input-checkbox {
     width: 1%;
 }

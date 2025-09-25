@@ -1,19 +1,26 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
     <div class="card mb-3" id="project-{{ project.id }}">
-    <div class="card-header d-flex flex-row justify-content-between align-items-center">
-        <h5>{{ project.name }}</h5>
-        <div class="card-header-items">
-            test
+        <div class="card-header d-flex flex-row justify-content-between align-items-center">
+            <div class="project-name-block d-flex flex-row gap-4">
+                <h5>{{ project.name }}</h5>
+                <div id="project-update-form-container-{{ project.id }}" class="d-flex justify-content-center"></div>
+            </div>
+            <div class="card-header-items">
+                <button hx-get="{% url 'projects-update' project.pk %}"
+                        hx-target="#project-update-form-container-{{ project.id }}"
+                        hx-swap="outerHTML"><img src="{% static 'images/icons/edit.svg' %}" alt="">
+                </button>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <ul id="tasks-{{ project.id }}" class="px-0 my-0">
+                {% for task in project.tasks.all %}
+                    {% include 'partials/tasks/list.html' with task=task %}
+                {% endfor %}
+            </ul>
+
         </div>
     </div>
-    <div class="card-body p-0">
-        <ul id="tasks-{{ project.id }}" class="px-0 my-0">
-            {% for task in project.tasks.all %}
-                {% include 'partials/tasks/list.html' with task=task %}
-            {% endfor %}
-        </ul>
-
-    </div>
-</div>
 {% endblock content %}

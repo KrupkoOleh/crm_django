@@ -1,4 +1,4 @@
-{#{% extends 'base.html' %}#}
+{% extends 'base.html' %}
 {% block content %}
     <div class="projects-list">
         <div id="projects-container">
@@ -13,7 +13,8 @@
                 <button class="btn btn-primary py-3 px-5"
                         hx-get="{% url 'projects-create' %}"
                         hx-target="#project-form-container"
-                        hx-trigger="click">
+                        hx-trigger="click"
+                        style="background: #003366">
                     Add TODO List
                 </button>
             </div>
