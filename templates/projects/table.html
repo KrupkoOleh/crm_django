@@ -1,12 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
     <div class="projects-list">
-        <div id="projects-container">
-            {% for project in projects %}
-                {% include 'partials/projects/project_card.html' with project=project %}
-            {% endfor %}
-        </div>
-
+        {% include 'partials/projects/projects_list.html' %}
         <div class="button-add-projects d-flex flex-column justify-content-center mt-5">
             <div id="project-form-container" class="d-flex justify-content-center"></div>
             <div class="button-create-project d-flex justify-content-center align-center">
@@ -14,6 +9,7 @@
                         hx-get="{% url 'projects-create' %}"
                         hx-target="#project-form-container"
                         hx-trigger="click"
+                        hx-swap="innerHTML"
                         style="background: #003366">
                     Add TODO List
                 </button>

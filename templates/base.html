@@ -17,8 +17,9 @@
             crossorigin="anonymous"></script>
 </head>
 <body>
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 {% if messages %}
-{#    {% include 'parts/messages.html' %}#}
+    {#    {% include 'parts/messages.html' %}#}
 {% endif %}
 {% block header %}
     {#    {% include 'parts/header.html' %}#}
@@ -36,6 +37,15 @@
         crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"
         integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
-{% block extra_scripts %}{% endblock extra_scripts %}
+{% block extra_scripts %}
+    <script>
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            if (csrftoken) {
+                event.detail.headers['X-CSRFToken'] = csrftoken;
+            }
+        });
+    </script>
+{% endblock extra_scripts %}
 </body>
 </html>
