@@ -1,0 +1,8 @@
+<form class="d-flex flex-column align-center gap-2 my-3"
+      hx-post="{% url 'task-update' object.pk %}"
+      hx-target="#task-{{ object.pk }}"
+      hx-swap="outerHTML">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary p-0" style="background: #003366">Сохранить</button>
+</form>

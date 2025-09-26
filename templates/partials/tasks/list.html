@@ -1,0 +1,53 @@
+{#{% extends 'base.html' %}#}
+{#{% load static %}#}
+{#{% block content %}#}
+{#    <li id="task-{{ task.id }}" style="list-style-type: none">#}
+{#        <table class="table table-bordered custom-table mb-0">#}
+{#            <tbody>#}
+{#            <tr>#}
+{#                <td class="input-checkbox"><input type="checkbox"></td>#}
+{#                <td class="col-10">{{ task.name }}</td>#}
+{#                <td class="col-1">#}
+{#                    <button hx-get="{% url 'task-update' task.pk %}"#}
+{#                            hx-target="#task-update-form-container-{{ task.id }}"#}
+{#                            hx-swap="innerHTML"><img src="{% static 'images/icons/edit.svg' %}" alt="update">#}
+{#                    </button>#}
+{#                </td>#}
+{#            </tr>#}
+{#            </tbody>#}
+{#        </table>#}
+{#        <div id="task-update-form-container-{{ task.id }}" class="d-flex justify-content-center"></div>#}
+{#    </li>#}
+{#{% endblock %}#}
+{% load static %}
+    <li class="task-element" id="task-{{ task.id }}" style="list-style-type: none">
+        <table class="table table-bordered custom-table mb-0">
+            <tbody>
+            <tr>
+                <td class="input-checkbox">
+                    <input type="checkbox" {% if task.status == 'DONE' %}checked{% endif %} disabled>
+                </td>
+
+                <td class="col-10">{{ task.name }}</td>
+                <td class="col-1">
+                    <div class="task-tools flex-row gap-10">
+                        <input type="hidden" name="task" value="{{ task.id }}">
+                        <span class="drag-handle d-flex align-center"><img src="{% static 'images/icons/pozition.svg' %}" alt=""></span>
+                        <button hx-get="{% url 'task-update' task.pk %}"
+                                hx-target="#task-update-form-container-{{ task.id }}"
+                                hx-swap="innerHTML"><img src="{% static 'images/icons/edit.svg' %}" alt="update">
+                        </button>
+                        <button
+                                hx-post="{% url 'task-delete' task.pk %}"
+                                hx-target="#tasks-{{ task.project.id }}"
+                                hx-swap="innerHTML"
+                                hx-confirm="Вы уверены, что хотите удалить задачу?">
+                            <img src="{% static 'images/icons/trash.svg' %}" alt="delete">
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div id="task-update-form-container-{{ task.id }}" class="d-flex justify-content-center"></div>
+    </li>

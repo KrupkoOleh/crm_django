@@ -1,0 +1,5 @@
+<div id="projects-container">
+    {% for project in projects %}
+        {% include 'partials/projects/project_card.html' with project=project %}
+    {% endfor %}
+</div>
