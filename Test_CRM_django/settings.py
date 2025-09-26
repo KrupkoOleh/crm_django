@@ -93,6 +93,9 @@ AUTHENTICATION_BACKENDS = [
 ACCOUNT_LOGOUT_REDIRECT_URL = reverse_lazy('projects-list')
 LOGIN_REDIRECT_URL = reverse_lazy('projects-list')
 
+ACCOUNT_EMAIL_VERIFICATION = env.str('ACCOUNT_EMAIL_VERIFICATION',
+                                     default='ACCOUNT_EMAIL_VERIFICATION')
+
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 
@@ -102,9 +105,13 @@ WSGI_APPLICATION = 'Test_CRM_django.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": 'django.db.backends.postgresql',
+        "NAME": env("SQL_DATABASE", default="SQL_DATABASE"),
+        "USER": env("SQL_USER", default="SQL_USER"),
+        "PASSWORD": env("SQL_PASSWORD", default="SQL_PASSWORD"),
+        "HOST": env("SQL_HOST", default="SQL_HOST"),
+        "PORT": env("SQL_PORT", default="5432"),
     }
 }
 
