@@ -1,5 +1,8 @@
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
@@ -11,6 +14,11 @@ class ProjectListView(ListView):
     model = Projects
     template_name = 'projects/table.html'
     context_object_name = 'projects'
+    login_url = reverse_lazy('account_login')
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         return Projects.objects.filter(owner=self.request.user)
