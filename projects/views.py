@@ -1,0 +1,115 @@
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+
+from projects.forms import CreateTaskForm, UpdateTaskForm
+from projects.models import Projects, Tasks
+
+
+class ProjectListView(ListView):
+    model = Projects
+    template_name = 'projects/table.html'
+    context_object_name = 'projects'
+    login_url = reverse_lazy('account_login')
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Projects.objects.filter(owner=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = CreateTaskForm()
+        return context
+
+
+class ProjectCreateView(CreateView):
+    model = Projects
+    template_name = 'partials/projects/project_create_form.html'
+    fields = ['name']
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        task_create_form = CreateTaskForm()
+        project = form.save()
+        html = render_to_string('partials/projects/project_card.html', {'project': project, 'form': task_create_form})
+        return HttpResponse(html)
+
+
+class ProjectUpdateView(UpdateView):
+    model = Projects
+    template_name = 'partials/projects/project_update_form.html'
+    fields = '__all__'
+
+    def form_valid(self, form):
+        self.object = form.save()
+        html = render_to_string('partials/projects/project_card.html', {'project': self.object})
+        return HttpResponse(html)
+
+
+class ProjectDeleteView(DeleteView):
+    model = Projects
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        projects = Projects.objects.all()
+        html = render_to_string('partials/projects/projects_list.html', {'projects': projects})
+        return HttpResponse(html)
+
+
+class TaskCreateView(CreateView):
+    model = Tasks
+    form_class = CreateTaskForm
+
+    def form_valid(self, form):
+        project = Projects.objects.get(id=self.kwargs.get('project_id'))
+        form.instance.project = project
+        task = form.save()
+
+        if self.request.headers.get("HX-Request"):
+            html = render_to_string("partials/tasks/list.html", {"task": task})
+            return HttpResponse(html)
+
+        return super().form_valid(form)
+
+
+class TaskUpdateView(UpdateView):
+    model = Tasks
+    form_class = UpdateTaskForm
+    template_name = 'partials/tasks/task_update_form.html'
+
+    def form_valid(self, form):
+        task = form.save()
+        if self.request.headers.get("HX-Request"):
+            html = render_to_string("partials/tasks/list.html", {"task": task})
+            return HttpResponse(html)
+        return super().form_valid(form)
+
+
+class TaskDeleteView(DeleteView):
+    model = Tasks
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        project = self.object.project
+        self.object.delete()
+        tasks = project.tasks.all()
+        html = render_to_string('partials/tasks/tasks_list.html', {'tasks': tasks})
+        return HttpResponse(html)
+
+
+class TaskReorderView(View):
+    def post(self, request, project_id):
+        task_ids = request.POST.getlist('task')
+        for index, task_id in enumerate(task_ids):
+            task = Tasks.objects.get(id=task_id, project_id=project_id)
+            task.priority = index
+            task.save()
+        return HttpResponse(status=204)

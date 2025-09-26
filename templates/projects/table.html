@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="projects-list">
+        {% include 'partials/projects/projects_list.html' %}
+        <div class="button-add-projects d-flex flex-column justify-content-center mt-5">
+            <div id="project-form-container" class="d-flex justify-content-center"></div>
+            <div class="button-create-project d-flex justify-content-center align-center">
+                <button class="btn btn-primary py-3 px-5"
+                        hx-get="{% url 'projects-create' %}"
+                        hx-target="#project-form-container"
+                        hx-trigger="click"
+                        hx-swap="innerHTML"
+                        style="background: #003366">
+                    Add TODO List
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}

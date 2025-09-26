@@ -1,0 +1,12 @@
+<form hx-post="{% url 'task-create' project_id %}"
+      hx-target="#tasks-{{ project_id }}"
+      hx-swap="beforeend"
+      class="d-flex flex-row mb-0 p-3" style="background-color: lightgray">
+    {% csrf_token %}
+    {{ form.name }}
+    {{ form.errors }}
+    <button type="submit" class="btn btn-primary mt-2 text-nowrap" style="background: darkslategray">
+        Create task
+    </button>
+</form>
+

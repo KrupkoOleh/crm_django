@@ -1,0 +1,88 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock title %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
+          crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="{% static 'style/style.css' %}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"
+            integrity="sha384-ZBXiYtYQ6hJ2Y0ZNoYuI+Nq5MqWBr+chMrS/RkXpNzQCApHEhOt2aY8EJgqwHLkJ"
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+{% if messages %}
+    {#    {% include 'parts/messages.html' %}#}
+{% endif %}
+{% block header %}
+        {% include 'partials/header.html' %}
+{% endblock header %}
+
+{% block content %}
+
+{% endblock content %}
+
+{% block footer %}
+
+{% endblock footer %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+        crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"
+        integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+{% block extra_scripts %}
+    <script>
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            if (csrftoken) {
+                event.detail.headers['X-CSRFToken'] = csrftoken;
+            }
+        });
+
+        htmx.onLoad(function (content) {
+            var sortables = content.querySelectorAll(".sortable");
+            for (var i = 0; i < sortables.length; i++) {
+                var sortable = sortables[i];
+                var sortableInstance = new Sortable(sortable, {
+                    handle: '.drag-handle',
+                    animation: 150,
+                    ghostClass: 'blue-background-class',
+
+                    // Сделать `.htmx-indicator` не сортируемым
+                    filter: ".htmx-indicator",
+                    onMove: function (evt) {
+                        return evt.related.className.indexOf('htmx-indicator') === -1;
+                    },
+
+                    // На событии end отправляем форму с новым порядком
+                    onEnd: function (evt) {
+                        // На время отключаем сортировку
+                        this.option("disabled", true);
+
+                        // Найти родительскую форму и триггернуть htmx
+                        var form = evt.from.closest('form');
+                        if (form) {
+                            htmx.trigger(form, 'end'); // 'end' триггер совпадает с hx-trigger
+                        }
+                    }
+                });
+
+                // Включаем сортировку после htmx-обновления
+                sortable.addEventListener("htmx:afterSwap", function () {
+                    sortableInstance.option("disabled", false);
+                });
+            }
+        });
+    </script>
+
+{% endblock extra_scripts %}
+</body>
+</html>
