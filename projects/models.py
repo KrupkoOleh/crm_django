@@ -1,17 +1,24 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 
 from Test_CRM_django.mixins.models import PKMixin
 from Test_CRM_django.model_choices import Status
 
+User = get_user_model()
 
 class Projects(PKMixin):
     name = models.CharField(max_length=100)
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='projects'
+    )
 
     def __str__(self):
         return self.name
 
     class Meta:
-        unique_together = ('name',)
+        unique_together = ('name', 'owner')
 
 
 class Tasks(PKMixin):

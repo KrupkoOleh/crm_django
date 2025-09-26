@@ -12,6 +12,9 @@ class ProjectListView(ListView):
     template_name = 'projects/table.html'
     context_object_name = 'projects'
 
+    def get_queryset(self):
+        return Projects.objects.filter(owner=self.request.user)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = CreateTaskForm()
@@ -21,9 +24,10 @@ class ProjectListView(ListView):
 class ProjectCreateView(CreateView):
     model = Projects
     template_name = 'partials/projects/project_create_form.html'
-    fields = '__all__'
+    fields = ['name']
 
     def form_valid(self, form):
+        form.instance.owner = self.request.user
         project = form.save()
         html = render_to_string('partials/projects/project_card.html', {'project': project})
         return HttpResponse(html)
