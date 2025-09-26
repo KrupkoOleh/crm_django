@@ -21,4 +21,5 @@ from projects.urls import urlpatterns as project_urlpatterns
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('projects/', include(project_urlpatterns)),
+    path('accounts/', include('allauth.urls')),
 ]
