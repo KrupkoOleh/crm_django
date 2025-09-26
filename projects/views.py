@@ -28,8 +28,9 @@ class ProjectCreateView(CreateView):
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
+        task_create_form = CreateTaskForm()
         project = form.save()
-        html = render_to_string('partials/projects/project_card.html', {'project': project})
+        html = render_to_string('partials/projects/project_card.html', {'project': project, 'form': task_create_form})
         return HttpResponse(html)
 
 
