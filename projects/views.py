@@ -59,9 +59,9 @@ class ProjectDeleteView(DeleteView):
     model = Projects
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.object.delete()
-        projects = Projects.objects.all()
+        project_id = kwargs.get('pk')
+        Projects.objects.filter(pk=project_id).delete()
+        projects = Projects.objects.filter(owner=request.user).prefetch_related('tasks')
         html = render_to_string('partials/projects/projects_list.html', {'projects': projects})
         return HttpResponse(html)
 
