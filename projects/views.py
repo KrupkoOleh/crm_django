@@ -21,7 +21,9 @@ class ProjectListView(ListView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        return Projects.objects.filter(owner=self.request.user)
+        qs = Projects.objects.filter(owner=self.request.user)
+        qs = qs.prefetch_related('tasks')
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
