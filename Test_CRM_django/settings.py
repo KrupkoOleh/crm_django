@@ -35,6 +35,8 @@ DEBUG = env.bool('DEBUG', default=True)
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
+ENABLE_SILK = env.bool('ENABLE_SILK', default=True)
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -51,6 +53,9 @@ INSTALLED_APPS = [
     'projects',
 ]
 
+if ENABLE_SILK:
+    INSTALLED_APPS.append('silk')
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -63,6 +68,9 @@ MIDDLEWARE = [
     # Add the account middleware:
     "allauth.account.middleware.AccountMiddleware",
 ]
+
+if ENABLE_SILK:
+    MIDDLEWARE.append('silk.middleware.SilkyMiddleware')
 
 ROOT_URLCONF = 'Test_CRM_django.urls'
 
