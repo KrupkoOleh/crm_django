@@ -99,10 +99,10 @@ class TaskDeleteView(DeleteView):
     model = Tasks
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        project = self.object.project
-        self.object.delete()
-        tasks = project.tasks.all()
+        task = Tasks.objects.select_related('project').get(pk=kwargs['pk'])
+        project = task.project
+        task.delete()
+        tasks = project.tasks.select_related('project')
         html = render_to_string('partials/tasks/tasks_list.html', {'tasks': tasks})
         return HttpResponse(html)
 
