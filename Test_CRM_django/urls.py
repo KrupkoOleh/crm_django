@@ -14,8 +14,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path, include
+
+from Test_CRM_django import settings
 from projects.urls import urlpatterns as project_urlpatterns
 
 urlpatterns = [
@@ -23,3 +26,6 @@ urlpatterns = [
     path('projects/', include(project_urlpatterns)),
     path('accounts/', include('allauth.urls')),
 ]
+
+if settings.ENABLE_SILK:
+    urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]
