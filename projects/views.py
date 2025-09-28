@@ -110,8 +110,9 @@ class TaskDeleteView(DeleteView):
 class TaskReorderView(View):
     def post(self, request, project_id):
         task_ids = request.POST.getlist('task')
-        for index, task_id in enumerate(task_ids):
-            task = Tasks.objects.get(id=task_id, project_id=project_id)
-            task.priority = index
-            task.save()
+        tasks = Tasks.objects.filter(id__in=task_ids, project_id=project_id)
+        task_map = {task_id: index for index, task_id in enumerate(task_ids)}
+        for task in tasks:
+            task.priority = task_map[str(task.id)]
+        Tasks.objects.bulk_update(tasks, ['priority'])
         return HttpResponse(status=204)
