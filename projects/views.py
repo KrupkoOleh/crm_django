@@ -21,7 +21,9 @@ class ProjectListView(ListView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        return Projects.objects.filter(owner=self.request.user)
+        qs = Projects.objects.filter(owner=self.request.user)
+        qs = qs.prefetch_related('tasks')
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -38,18 +40,24 @@ class ProjectCreateView(CreateView):
         form.instance.owner = self.request.user
         task_create_form = CreateTaskForm()
         project = form.save()
-        html = render_to_string('partials/projects/project_card.html', {'project': project, 'form': task_create_form})
+        html = render_to_string('partials/projects/project_card.html', {
+            'project': project,
+            'form': task_create_form})
         return HttpResponse(html)
 
 
 class ProjectUpdateView(UpdateView):
     model = Projects
     template_name = 'partials/projects/project_update_form.html'
-    fields = '__all__'
+    fields = ['name']
 
     def form_valid(self, form):
+        form.instance.owner = self.request.user
         self.object = form.save()
-        html = render_to_string('partials/projects/project_card.html', {'project': self.object})
+        task_create_form = CreateTaskForm()
+        html = render_to_string('partials/projects/project_card.html', {
+            'project': self.object,
+            'form': task_create_form})
         return HttpResponse(html)
 
 
@@ -57,10 +65,11 @@ class ProjectDeleteView(DeleteView):
     model = Projects
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.object.delete()
-        projects = Projects.objects.all()
-        html = render_to_string('partials/projects/projects_list.html', {'projects': projects})
+        project_id = kwargs.get('pk')
+        Projects.objects.filter(pk=project_id).delete()
+        projects = Projects.objects.filter(owner=request.user).prefetch_related('tasks')
+        html = render_to_string('partials/projects/projects_list.html', {
+            'projects': projects})
         return HttpResponse(html)
 
 
@@ -97,10 +106,10 @@ class TaskDeleteView(DeleteView):
     model = Tasks
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        project = self.object.project
-        self.object.delete()
-        tasks = project.tasks.all()
+        task = Tasks.objects.select_related('project').get(pk=kwargs['pk'])
+        project = task.project
+        task.delete()
+        tasks = project.tasks.select_related('project')
         html = render_to_string('partials/tasks/tasks_list.html', {'tasks': tasks})
         return HttpResponse(html)
 
@@ -108,8 +117,9 @@ class TaskDeleteView(DeleteView):
 class TaskReorderView(View):
     def post(self, request, project_id):
         task_ids = request.POST.getlist('task')
-        for index, task_id in enumerate(task_ids):
-            task = Tasks.objects.get(id=task_id, project_id=project_id)
-            task.priority = index
-            task.save()
+        tasks = Tasks.objects.filter(id__in=task_ids, project_id=project_id)
+        task_map = {task_id: index for index, task_id in enumerate(task_ids)}
+        for task in tasks:
+            task.priority = task_map[str(task.id)]
+        Tasks.objects.bulk_update(tasks, ['priority'])
         return HttpResponse(status=204)
