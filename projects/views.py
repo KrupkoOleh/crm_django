@@ -40,18 +40,24 @@ class ProjectCreateView(CreateView):
         form.instance.owner = self.request.user
         task_create_form = CreateTaskForm()
         project = form.save()
-        html = render_to_string('partials/projects/project_card.html', {'project': project, 'form': task_create_form})
+        html = render_to_string('partials/projects/project_card.html', {
+            'project': project,
+            'form': task_create_form})
         return HttpResponse(html)
 
 
 class ProjectUpdateView(UpdateView):
     model = Projects
     template_name = 'partials/projects/project_update_form.html'
-    fields = '__all__'
+    fields = ['name']
 
     def form_valid(self, form):
+        form.instance.owner = self.request.user
         self.object = form.save()
-        html = render_to_string('partials/projects/project_card.html', {'project': self.object})
+        task_create_form = CreateTaskForm()
+        html = render_to_string('partials/projects/project_card.html', {
+            'project': self.object,
+            'form': task_create_form})
         return HttpResponse(html)
 
 
@@ -62,7 +68,8 @@ class ProjectDeleteView(DeleteView):
         project_id = kwargs.get('pk')
         Projects.objects.filter(pk=project_id).delete()
         projects = Projects.objects.filter(owner=request.user).prefetch_related('tasks')
-        html = render_to_string('partials/projects/projects_list.html', {'projects': projects})
+        html = render_to_string('partials/projects/projects_list.html', {
+            'projects': projects})
         return HttpResponse(html)
 
 
